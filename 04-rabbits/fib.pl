@@ -14,29 +14,19 @@ if (!@ARGV) {
 my $n = shift or die "Need n (# rabbits)\n";
 my $k = shift || 1;
 
-unless (defined $n && $n > 0 && $n <= $max_n) {
-    die sprintf("Bad n (%s) :: 0 < n <= $max_n\n", defined $n ? $n : 'undef');
+unless ($n > 0 && $n <= $max_n) {
+    die "Bad n ($n) :: 0 < n <= $max_n\n";
 }
 
-unless (defined $k && $k > 0 && $k <= $max_k) {
-    die sprintf("Bad k (%s) :: 0 < k <= $max_k\n", defined $k ? $k : 'undef');
+unless ($k > 0 && $k <= $max_k) {
+    die "Bad k ($k) :: 0 < k <= $max_k\n";
 }
 
-# e.g., k=1: 1 1 2 3  5  8  13
-# e.g., k=3: 1 4 4 7 11 18 29
-my $total;
-my @series = (1, $k); # initialize the series
-for my $i (1..$n) {
-     $total = sum(@series);
-     shift @series; 
-     push @series, $total; 
-}
+printf "(n :: %s, k :: %s) -> %s\n", $n, $k, fib($n, $k);
+exit 0;
 
-say "(n :: $n, k :: $k) -> $total";
-
-sub sum {
-    my $sum = 0;
-    map { $sum += $_ } @_;
-    print join(' + ', @_), " = $sum\n";
-    return $sum;
+sub fib {
+    my ($n, $k) = @_;
+    return 1 if $n < 3;
+    return fib($n-1, $k) + $k * fib($n-2, $k);
 }
