@@ -26,6 +26,8 @@ while (my $chunk = <$fh>) {
 
 close $fh;
 
-@seqs = sort { $b->[1] <=> $a->[1] } @seqs;
-print join "\n", @{ $seqs[0] }, '';
+if (@seqs) {
+    my ($max) = sort { $b->[1] <=> $a->[1] } @seqs;
+    print join "\n", @$max, '';
+}
 
