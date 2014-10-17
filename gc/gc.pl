@@ -19,13 +19,13 @@ while (my $chunk = <$fh>) {
     my @lines  = split /\n/, $chunk;
     my $id     = shift @lines;
     my $seq    = join('', @lines);
-    my $gc     = join('', grep { /[GC]/i } split('', $seq));
+    my $gc     = length(join('', grep { /[GC]/i } split('', $seq)));
 
-    push @seqs, [ sprintf('%.6f', length($gc) * 100 /length $seq), $id ];
+    push @seqs, [ $id, sprintf('%.6f', $gc * 100 /length $seq) ];
 }
 
 close $fh;
 
-@seqs = sort { $b->[0] <=> $a->[0] } @seqs;
-print join "\n", reverse(@{ $seqs[0] }), '';
+@seqs = sort { $b->[1] <=> $a->[1] } @seqs;
+print join "\n", @{ $seqs[0] }, '';
 
