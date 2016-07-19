@@ -5,7 +5,7 @@ use FastaParser;
 
 sub MAIN (Str $fasta) {
     my @seqs = parse_file($fasta).map(-> [$id, $seq] { $seq });
-    my $max  = @seqs.map(*.chars).max;
+    my $max  = [max] @seqs>>.chars;
     my $nseqs = @seqs.elems;
     put "nseqs $nseqs, max ($max)";
 
@@ -13,15 +13,31 @@ sub MAIN (Str $fasta) {
         die "No sequence long enough";
     }
 
-    my @promises = (for 2..20 -> $k {
-        start {
-            my $bag = bag @seqs.map(-> $seq { kmers($seq, $k) });
-            my @matches = $bag.grep(*.value == $nseqs).map(*.key) or last;
-            put "$k = {@matches.pick}";
-        };
-    });
+    my $bag-channel = Channel.new;
+    say "spinning up react block";
+    my $p = start {
+        react {
+            whenever $bag-channel -> [$bag, $k] {
+                if $bag.grep(*.value == $nseqs).map(*.keys) -> @matches {
+                    say "$k = {@matches}";
+                    done();
+                }
+            }
+        }
+    }
 
-    await @promises;
+    say "feeding channel";
+    (2..$max).map: -> $k {
+        start {
+            $bag-channel.send: [ bag(@seqs.map(-> $seq { kmers($seq, $k) })), $k ];
+        }
+    }
+
+    say "awaiting a react promise";
+    await $p;
+
+    say "closing the bag";
+    $bag-channel.close;
 }
 
 sub kmers (Str $string, Int $k) {
