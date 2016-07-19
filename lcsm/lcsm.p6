@@ -16,7 +16,7 @@ sub MAIN (Str $fasta) {
     my @promises = (for 2..20 -> $k {
         start {
             my $bag = bag @seqs.map(-> $seq { kmers($seq, $k) });
-            my @matches = $bag.grep(*.value == $nseqs).map(*.key) or last;
+            my @matches = $bag.grep(*.value == $nseqs).map(*.key) || last;
             put "$k = {@matches.pick}";
         };
     });
