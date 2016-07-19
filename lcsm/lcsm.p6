@@ -3,6 +3,8 @@
 use lib '../lib';
 use FastaParser;
 
+PROCESS::<$SCHEDULER> = ThreadPoolScheduler.new(initial_threads => 0, max_threads => 2);
+
 sub MAIN (Str $fasta) {
     my @seqs = parse_file($fasta).map(-> [$id, $seq] { $seq });
     my $max  = [max] @seqs».chars;
@@ -25,6 +27,7 @@ sub MAIN (Str $fasta) {
 }
 
 sub kmers (Str $string, Int $k) {
+    put $++;
     (for 0..^($string.chars - $k + 1) -> $i { $string.substr($i, $k) }).unique;
 }
 
