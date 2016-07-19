@@ -5,7 +5,7 @@ use FastaParser;
 
 sub MAIN (Str $fasta) {
     my @seqs = parse_file($fasta).map(-> [$id, $seq] { $seq });
-    my $max  = @seqs.map(*.chars).max;
+    my $max  = [max] @seqs».chars;
     my $nseqs = @seqs.elems;
     put "nseqs $nseqs, max ($max)";
 
