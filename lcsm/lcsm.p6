@@ -3,6 +3,8 @@
 use lib '../lib';
 use FastaParser;
 
+use experimental :cached;
+
 PROCESS::<$SCHEDULER> = ThreadPoolScheduler.new(initial_threads => 0, max_threads => 2);
 
 sub MAIN (Str $fasta) {
@@ -16,18 +18,17 @@ sub MAIN (Str $fasta) {
     }
 
     my @promises = (for 2..20 -> $k {
-        start {
+        start sub {
             my $bag = bag @seqs.map(-> $seq { kmers($seq, $k) });
-            my @matches = $bag.grep(*.value == $nseqs).map(*.key) || last;
+            my @matches = $bag.grep(*.value == $nseqs).map(*.key) or return;
             put "$k = {@matches.pick}";
-        };
+        }();
     });
 
     await @promises;
 }
 
-sub kmers (Str $string, Int $k) {
-    put $++;
+sub kmers (Str $string, Int $k) is cached {
     (for 0..^($string.chars - $k + 1) -> $i { $string.substr($i, $k) }).unique;
 }
 
