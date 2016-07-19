@@ -3,9 +3,11 @@
 use lib '../lib';
 use FastaParser;
 
+PROCESS::<$SCHEDULER> = ThreadPoolScheduler.new(initial_threads => 0, max_threads => 2);
+
 sub MAIN (Str $fasta) {
     my @seqs = parse_file($fasta).map(-> [$id, $seq] { $seq });
-    my $max  = @seqs.map(*.chars).max;
+    my $max  = [max] @seqs».chars;
     my $nseqs = @seqs.elems;
     put "nseqs $nseqs, max ($max)";
 
@@ -16,7 +18,7 @@ sub MAIN (Str $fasta) {
     my @promises = (for 2..20 -> $k {
         start {
             my $bag = bag @seqs.map(-> $seq { kmers($seq, $k) });
-            my @matches = $bag.grep(*.value == $nseqs).map(*.key) or last;
+            my @matches = $bag.grep(*.value == $nseqs).map(*.key) || last;
             put "$k = {@matches.pick}";
         };
     });
@@ -25,6 +27,7 @@ sub MAIN (Str $fasta) {
 }
 
 sub kmers (Str $string, Int $k) {
+    put $++;
     (for 0..^($string.chars - $k + 1) -> $i { $string.substr($i, $k) }).unique;
 }
 
