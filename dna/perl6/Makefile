@@ -1,0 +1,10 @@
+.PHONY: run file test
+
+run:
+	./dna.pl6 AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC
+
+file:
+	./dna.pl6 test.txt
+
+test:
+	./test.pl6
