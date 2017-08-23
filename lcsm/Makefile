@@ -3,3 +3,6 @@ all:
 
 profile:
 	perl6 --profile=instrumented lcsm.p6 rosalind_lcsm.txt
+
+clean:
+	rm profile-*.html

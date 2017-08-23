@@ -28,5 +28,5 @@ exit 0;
 sub fib {
     my ($n, $k) = @_;
     return 1 if $n < 3;
-    return fib($n-1, $k) + $k * fib($n-2, $k);
+    return fib($n - 1, $k) + $k * fib($n - 2, $k);
 }

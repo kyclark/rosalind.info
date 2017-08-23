@@ -1,6 +1,7 @@
 #!/usr/bin/env perl6
 
-sub MAIN (Str $string, Str $pattern) {
+sub MAIN (Str $input, Str $pattern) {
+    my Str $string = $input.IO.e ?? $input.IO.slurp !! $input;
     my $n = $pattern.chars;
 
     my @locs;
