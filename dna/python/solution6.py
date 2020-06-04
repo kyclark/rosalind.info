@@ -32,8 +32,10 @@ def main():
 
     args = get_args()
     count = Counter(args.dna.lower())
-    count_of = lambda base: str(count.get(base, 0))
-    print(' '.join(map(count_of, 'acgt')))
+    print(' '.join(map(lambda base: str(count.get(base, 0)), 'acgt')))
+
+    # count_of = lambda base: str(count.get(base, 0))
+    # print(' '.join(map(count_of, 'acgt')))
 
 
 

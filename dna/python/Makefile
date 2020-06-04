@@ -1,10 +1,4 @@
-.PHONY: run file test
-
-run:
-	./dna.py AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC
-
-file:
-	./dna.py test.txt
+.PHONY: test
 
 test:
-	python3 -m pytest -v test.py
+	pytest -xv test.py

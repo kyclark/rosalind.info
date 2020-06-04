@@ -1,29 +1,48 @@
 #!/usr/bin/env python3
 """tests for dna.py"""
 
-import os.path
+import os
 from subprocess import getstatusoutput, getoutput
-import re
 
-script = "./dna.py"
+prg = './dna.py'
+input1 = './inputs/input1.txt'
+input2 = './inputs/input2.txt'
+expected1 = '20 12 17 21'
+expected2 = '196 231 237 246'
 
-def test_script_exists():
-    """script is there"""
-    assert os.path.exists(script)
 
+# --------------------------------------------------
+def test_exists():
+    """program exists"""
+
+    assert os.path.exists(prg)
+
+
+# --------------------------------------------------
 def test_usage():
-    """prints usage with no args"""
-    (retval, out) = getstatusoutput(script)
-    assert retval > 0
-    assert re.search("usage", out, re.IGNORECASE)
+    """prints usage with no args or for help"""
 
+    for arg in ['', '-h', '--help']:
+        out = getoutput(f'{prg} {arg}')
+        assert out.lower().startswith('usage:')
+
+
+# --------------------------------------------------
 def test_arg():
     """uses command-line arg"""
-    dna = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
-    out = getoutput("{} {}".format(script, dna)).rstrip()
-    assert out == '20 12 17 21'
 
+    for file, expected in [(input1, expected1), (input2, expected2)]:
+        dna = open(file).read()
+        rv, out = getstatusoutput(f'{prg} {dna}')
+        assert rv == 0
+        assert out == expected
+
+
+# --------------------------------------------------
 def test_file():
     """uses file arg"""
-    out = getoutput("{} {}".format(script, "test.txt")).rstrip()
-    assert out == '20 12 17 21'
+
+    for file, expected in [(input1, expected1), (input2, expected2)]:
+        rv, out = getstatusoutput(f'{prg} {file}')
+        assert rv == 0
+        assert out == expected

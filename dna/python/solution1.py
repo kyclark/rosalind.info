@@ -6,7 +6,7 @@ Purpose: Tetranucleotide frequency
 
 import argparse
 import os
-from collections import Counter
+
 
 # --------------------------------------------------
 def get_args():
@@ -31,10 +31,19 @@ def main():
     """Make a jazz noise here"""
 
     args = get_args()
-    count = Counter(args.dna.lower())
-    count_of = lambda base: str(count.get(base, 0))
-    print(' '.join(map(count_of, 'acgt')))
+    count_a, count_c, count_g, count_t = 0, 0, 0, 0
 
+    for base in args.dna.lower():
+        if base == 'a':
+            count_a += 1
+        elif base == 'c':
+            count_c += 1
+        elif base == 'g':
+            count_g += 1
+        elif base == 't':
+            count_t += 1
+
+    print(f'{count_a} {count_c} {count_g} {count_t}')
 
 
 # --------------------------------------------------
