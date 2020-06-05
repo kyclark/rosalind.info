@@ -1,25 +1,15 @@
 #!/usr/bin/env python3
-"""tests for transcribe.py"""
+"""tests for revc.py"""
 
-from subprocess import getstatusoutput
-import os.path
+from subprocess import getstatusoutput, getoutput
+import os
 import re
-import string
-import random
-from shutil import rmtree
 
 prg = './revc.py'
 input1 = './inputs/input1.txt'
 input2 = './inputs/input2.txt'
 output1 = './inputs/output1.txt'
 output2 = './inputs/output2.txt'
-
-
-# --------------------------------------------------
-def random_filename():
-    """generate a random filename"""
-
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
 
 
 # --------------------------------------------------
@@ -33,10 +23,9 @@ def test_exists():
 def test_usage():
     """usage"""
 
-    for flag in ['-h', '--help']:
-        rv, out = getstatusoutput('{} {}'.format(prg, flag))
-        assert rv == 0
-        assert re.match("usage", out, re.IGNORECASE)
+    for arg in ['', '-h', '--help']:
+        out = getoutput(f'{prg} {arg}')
+        assert out.lower().startswith('usage:')
 
 
 # --------------------------------------------------
@@ -65,6 +54,7 @@ def test_lowercase():
     assert rv == 0
     assert out == 'accgggtttt'
 
+
 # --------------------------------------------------
 def test_input1():
     """runs on good input"""
@@ -73,6 +63,7 @@ def test_input1():
     expected = open(output1).read().rstrip()
     assert rv == 0
     assert out == expected
+
 
 # --------------------------------------------------
 def test_input2():
