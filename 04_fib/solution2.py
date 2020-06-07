@@ -40,11 +40,9 @@ def main():
     args = get_args()
 
     def fib(n):
-        nums = [0, 1]
-        for i in range(n - 1):
-            nums.append((nums[-2] * args.k) + nums[-1])
-
-        return nums[-1]
+        return 1 if n == 1 \
+            else n - 1 if n == 2 \
+            else fib(n - 2) * args.k + fib(n - 1)
 
     print(fib(args.n))
 

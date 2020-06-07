@@ -1,24 +1,48 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+"""
+Purpose: Calculate GC content
+Author : Ken Youens-Clark <kyclark@gmail.com>
+"""
 
-import sys
+import argparse
+import re
 from Bio import SeqIO
 
-def main(file):
-    sequences = []
-    for record in SeqIO.parse(file, "fasta"):
-        seq = record.seq
-        sum_gc = (seq.count('G') + seq.count('C')) * 100
-        gc = '%.6f' % float(float(sum_gc) / len(seq))
-        sequences.append((record.id, gc))
 
-    sequences.sort(key=lambda tup: tup[1], reverse=True)
-    max = list(sequences.pop(0))
-    print('\n'.join(max))
+# --------------------------------------------------
+def get_args():
+    """ Get command-line arguments """
 
+    parser = argparse.ArgumentParser(
+        description='Calculate GC content',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('file',
+                        metavar='FILE',
+                        type=argparse.FileType('rt'),
+                        help='Input sequence file')
+
+    return parser.parse_args()
+
+
+# --------------------------------------------------
+def main():
+    """ Make a jazz noise here """
+
+    args = get_args()
+    high = (0, '')
+
+    for rec in SeqIO.parse(args.file, 'fasta'):
+        # Use a regular expression to find G/Cs upper/lowercase
+        seq = str(rec.seq)
+        gc = re.findall('[gc]', seq, re.IGNORECASE)
+        pct = (len(gc) / len(seq)) * 100
+        if pct > high[0]:
+            high = (pct, rec.id)
+
+    print(f'{high[1]} {high[0]:0.06f}')
+
+
+# --------------------------------------------------
 if __name__ == '__main__':
-    args = sys.argv
-    if len(args) < 2:
-        print('Please provide a file argument')
-        exit()
-
-    main(args[1])
+    main()
