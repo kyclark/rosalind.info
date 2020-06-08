@@ -6,6 +6,7 @@ Purpose: Find subsequences
 
 import argparse
 import re
+from Bio.Seq import Seq
 
 
 # --------------------------------------------------
@@ -110,15 +111,28 @@ def main():
     # print(' '.join(found))
 
     # 7: kmers/FP
-    k = len(subseq)
-    found = filter(
-        lambda t: t[1] == subseq,
-        map(lambda i: (i + 1, seq[i:i + k]), range(len(seq) - k + 1)))
-    print(' '.join(map(lambda t: str(t[0]), found)))
+    # k = len(subseq)
+    # found = filter(
+    #     lambda t: t[1] == subseq,
+    #     map(lambda i: (i + 1, seq[i:i + k]), range(len(seq) - k + 1)))
+    # print(' '.join(map(lambda t: str(t[0]), found)))
 
-    # Regex does not handle overlaps
-    # matches = map(lambda m: m.start() + 1, re.finditer(args.subseq, args.seq))
-    # print(list(matches))
+    # 8: Regex to handle overlaps
+    # pattern = '(?=(' + args.subseq + '))'
+    # found = []
+    # for match in re.finditer(pattern, args.seq):
+    #     found.append(str(match.start() + 1))
+    # print(' '.join(found))
+
+    # 9: Shorter
+    # pattern = '(?=(' + args.subseq + '))'
+    # found = [str(m.start() + 1) for m in re.finditer(pattern, args.seq)]
+    # print(' '.join(found))
+
+    # 10: L.C. -> map()
+    pattern = '(?=(' + args.subseq + '))'
+    matches = map(lambda m: str(m.start() + 1), re.finditer(pattern, args.seq))
+    print(' '.join(matches))
 
 
 # --------------------------------------------------
