@@ -3,6 +3,7 @@
 
 import argparse
 from itertools import takewhile
+from Bio.Seq import Seq
 
 
 # --------------------------------------------------
@@ -67,7 +68,7 @@ def main():
         'GCU': 'A',
         'GGA': 'G',
         'GGC': 'G',
-        'GGG': 'G'
+        'GGG': 'G',
         'GGU': 'G',
         'GUA': 'V',
         'GUC': 'V',
@@ -119,12 +120,14 @@ def main():
     # print(''.join(takewhile(lambda c: c != 'Stop', aa)))
 
     # 5: combine all
-    print(''.join(
-        takewhile(
-            lambda c: c != 'Stop',
-            map(lambda c: codon_to_aa.get(c, '-'),
-                map(lambda i: seq[i:i + k], range(0, len(seq), k))))))
+    # print(''.join(
+    #     takewhile(
+    #         lambda c: c != 'Stop',
+    #         map(lambda c: codon_to_aa.get(c, '-'),
+    #             map(lambda i: seq[i:i + k], range(0, len(seq), k))))))
 
+    # 6: Seq
+    print(str(Seq(args.seq).translate()).replace('*', ''))
 
 # --------------------------------------------------
 if __name__ == '__main__':
