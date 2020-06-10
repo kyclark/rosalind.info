@@ -17,7 +17,7 @@ def get_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('file',
-                        metavar='str',
+                        metavar='FILE',
                         type=argparse.FileType('rt'),
                         help='FASTA file')
 
@@ -53,10 +53,12 @@ def main():
 
     beginning = defaultdict(list)
     end = defaultdict(list)
+
     for rec in SeqIO.parse(file, 'fasta'):
         kmers = find_kmers(rec.seq, k)
-        beginning[kmers[0]].append(rec.id)
-        end[kmers[-1]].append(rec.id)
+        if kmers:
+            beginning[kmers[0]].append(rec.id)
+            end[kmers[-1]].append(rec.id)
 
     logging.debug('BEGINNINGS\n{}'.format(pformat(beginning)))
     logging.debug('ENDS\n{}'.format(pformat(end)))
@@ -82,9 +84,11 @@ def find_kmers(seq, k):
 def test_find_kmers():
     """Test find_kmers"""
 
+    assert find_kmers('', 1) == []
     assert find_kmers('ACTG', 2) == ['AC', 'CT', 'TG']
     assert find_kmers('ACTG', 3) == ['ACT', 'CTG']
     assert find_kmers('ACTG', 4) == ['ACTG']
+    assert find_kmers('ACTG', 5) == []
 
 
 # --------------------------------------------------
