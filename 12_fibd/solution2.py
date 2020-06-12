@@ -2,7 +2,6 @@
 """Calculate Fibonacci with mortal rabbits"""
 
 import argparse
-from itertools import chain
 from collections import defaultdict
 
 
@@ -41,7 +40,7 @@ def main():
 
     args = get_args()
 
-    def generation(n: int) -> (int, int):
+    def gen(n: int) -> (int, int):
         """
         n: age in months
         return: (next age of this generation, age of progeny)
@@ -50,11 +49,11 @@ def main():
 
     # fib: list of dicts where key = age in month, value = number that age
     fib = [{1: 1}]
-    for i in range(args.n - 1):
+    for _ in range(args.n - 1):
         next_gen = defaultdict(int)
         for age, num in fib[-1].items():
             # Copy the "num" to the next generation and progeny
-            for val in filter(lambda n: n > 0, generation(age)):
+            for val in filter(lambda n: n > 0, gen(age)):
                 next_gen[val] += num
         fib.append(next_gen)
 

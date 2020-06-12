@@ -41,7 +41,7 @@ def main():
 
     args = get_args()
 
-    def generation(n: int) -> (int, int):
+    def gen(n: int) -> (int, int):
         """
         n: age in months
         return: (next age of this generation, age of progeny)
@@ -55,7 +55,7 @@ def main():
         next_gen = defaultdict(int)
         for age, num in acc.items():
             # Copy the "num" to the next generation and progeny
-            for val in filter(lambda n: n > 0, generation(age)):
+            for val in filter(lambda n: n > 0, gen(age)):
                 next_gen[val] += num
         return next_gen
 
