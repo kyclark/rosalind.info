@@ -32,13 +32,23 @@ Let's talk about the `gen()` function for a bit.
 Given the age of a mate pair, the function will produce a `list` of ages of the next generation of rabbits according to these rules:
 
 . Rabbits age 1 month cannot reproduce, so they can only age to 2.
-. Rabbits 2 months or older can reproducages of the next generation of rabbits according to these rules:
-
-. Rabbits age 1 month cannot reproduce, so they can only age to 2.
-. Rabbits who have reached the maximum age can only reproduce and so will only yield a 1.
+. Rabbits who have reached the maximum age can reproduce but not carry forward and so will only yield a 1.
 . Rabbits 2 months or older (who have not reached maxium age) can reproduce and age, so they will yield their age plus one and a 1.
 
 NOTE: The `gen()` function is defined _inside_ the `main()` function so that it can refer to the `args.m` (maxium age) value. This creates a "closure" as the function "closes around" that value.
+
+The `gen()` function essentially creates a _finite state machine_.
+For a maximum value of 3, we have the following rules:
+
+. 1 -> 2
+. 2 -> 1, 3
+. 3 -> 1
+
+----
+1 <-> 2 -> 3
+^         /
+ \_______/
+----
 
 We can define `gen()` in the REPL, but we need to change `args.m` to just the variable `m`.
 You must press Enter twice to create a blank line so that Python knows you are done with the definition:
@@ -88,7 +98,7 @@ I overwrite the value of `fib` on each iteration as we only need to track the la
 As noted, this version will choke around 30 generations on my laptop.
 A machine with more memory might be able to go further, but it's not advisable.
 
-If we add a few `print()` commands:
+Let's add a few `print()` commands to see how `fib` changes over time:
 
 ----
 fib = [1]                   <1>
@@ -129,7 +139,7 @@ I thought my previous solution was good as it worked well for the example case o
 This approach failed miserably, however, with anything value of `n` over 30, so I had to find another solution.
 I stepped away for a few hours, and the answer struck me just as I was trying to fall asleep.
 
-To me, the solution lay in the fact that I should be counting the numbers of rabbits at each each using a dictionary rather than using a list to represent each pair individually.
+To me, the solution lay in the fact that I should be counting the numbers of rabbits at each each age using a dictionary rather than using a list to represent each pair individually.
 For instance, notce how at the end there are two 1s?
 Another way to represent this would be as a "bag" footnote:[https://en.wikipedia.org/wiki/Bag-of-words_model] of items and their frequencies.
 
@@ -150,7 +160,7 @@ Now the answer can be had by adding the values of the dictionary:
 4
 ----
 
-In order to track the rabbits using a dictionary, I need to know the number of rabbits who will age and the number of rabbits who will be born in each iteration/generaion.
+In order to track the rabbits using a dictionary, I need to know the number of rabbits who will age and the number of rabbits who will be born in each iteration/generation.
 My previous `gen()` function returned a variable-length `list`, which won't do.
 I changed it to return a `tuple` showing the next age of this generation and the age of the progeny, both of which could be 0 according to the rules above.
 
