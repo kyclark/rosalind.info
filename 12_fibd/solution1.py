@@ -27,10 +27,10 @@ def get_args():
     args = parser.parse_args()
 
     if not 1 <= args.n <= 100:
-        parser.error('n "{args.n}" must be between 1 and 100')
+        parser.error(f'generations "{args.n}" must be between 1 and 100')
 
     if not 1 <= args.m <= 20:
-        parser.error('n "{args.m}" must be between 1 and 20')
+        parser.error(f'months "{args.m}" must be between 1 and 20')
 
     return args
 
