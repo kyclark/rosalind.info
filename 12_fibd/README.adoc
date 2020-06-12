@@ -1,0 +1,30 @@
+= Mortal Fibonacci Rabbits
+
+My first solution will produce a correct answer but is inefficient such that it would not complete in the 5 minute window for giving an answer.
+The reason is because I use a `list` to represent each rabbit as an age.
+Those that reach the maximum age (`args.m`) are reaped, but the growth is such that the program would stop working after about 30 generations.
+This is well short of the 80+ generations required to the satisfy the test where there are something like 10e19 rabbits, meaning I need Python to allocate a `list` of that many integer values!
+
+----
+def main():
+    def gen(n): <1>
+        return [1] if n == args.m else [2] if n == 1 else [n + 1, 1] <2>
+
+    fib = [1]   <3>
+    for i in range(args.n - 1): <4>
+        fib = list(chain.from_iterable(map(gen, fib))) <5>
+
+    print(len(fib)) <6>
+----
+
+<1> The `gen()` function will return the next generation for a given pair of rabbits according to their age.
+<2> If the rabbits have reached the maximum age, they create their offspring (who will be 1 month old in the next generation) and die. If the rabbits are 1 month old, they only carry themselves forward as 2 months old. Otherwise, the rabbits will be one month older and will also create offspring who will be 1 month old next time.
+<3> Start off with one pair of rabbits who are 1 month old.
+<4> Iterate through the number of months (`args.n`).
+<5> Each number in `fib` is the age of a pair of rabbits. Use `map()` to process each to create the next generation. The resulting data structure will be a `list` of lists which need to be flattened into a single list by `chain.from_iterable()`. This is a lazy function, so we need to further coerce it using the `list()` function. We can overwrite the `fib` variable each time as we don't need to keep track of every generation to answer this problem.
+<6> The length (`len()`) of the `fib` list is the number of pairs of rabbits left after iterating through the generations.
+
+As noted, this version will choke around 30 generations on my laptop.
+A machine with more memory might be able to go further, but it's not advisable.
+
+
