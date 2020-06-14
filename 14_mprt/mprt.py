@@ -6,6 +6,7 @@ import logging
 import os
 import re
 import requests
+import sys
 from typing import NamedTuple, List, TextIO
 from Bio import SeqIO
 
@@ -45,8 +46,10 @@ def main():
     """Make a jazz noise here"""
 
     args = get_args()
+
+    logging.basicConfig(filename='.log', filemode='w', level=logging.DEBUG)
     files = fetch_fasta(args.file, args.download_dir)
-    regex = re.compile('N[^P][ST][^P]')
+    regex = re.compile('(?=(N[^P][ST][^P]))')
 
     for file in files:
         seqs = list(SeqIO.parse(file, 'fasta'))
@@ -55,7 +58,6 @@ def main():
             continue
 
         seq = seqs[0]
-        # TODO: this misses overlapping hits!
         if hits := list(regex.finditer(str(seq.seq))):
             pos = map(lambda m: m.start() + 1, hits)
             name = os.path.basename(file).replace('.fa', '')
@@ -74,7 +76,7 @@ def fetch_fasta(fh: TextIO, fasta_dir: str) -> List[str]:
         fasta = os.path.join(fasta_dir, prot_id + '.fa')
         if not os.path.isfile(fasta):
             # TODO: Make this logging
-            print(f'Fetching "{prot_id}" -> {fasta}')
+            logging.debug(f'Fetching "{prot_id}" -> {fasta}')
             url = f'http://www.uniprot.org/uniprot/{prot_id}.fasta'
             response = requests.get(url)
             if response.status_code == 200:
