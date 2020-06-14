@@ -1,8 +1,7 @@
-all:
-	perl6 lcsm.p6 rosalind_lcsm.txt
+.PHONY: test clean
 
-profile:
-	perl6 --profile=instrumented lcsm.p6 rosalind_lcsm.txt
+test:
+	pytest -xv --disable-pytest-warnings test.py
 
 clean:
-	rm profile-*.html
+	rm -rf __pycache__

@@ -2,6 +2,7 @@
 """Longest Common Substring"""
 
 import argparse
+import sys
 from Bio import SeqIO
 import collections
 from typing import Counter, List, NamedTuple, TextIO
@@ -36,6 +37,10 @@ def main() -> None:
 
     args = get_args()
     seqs = list(map(lambda s: str(s.seq), SeqIO.parse(args.fasta, 'fasta')))
+
+    if not seqs:
+        sys.exit(f'"{args.fasta.name}" contains no sequences.')
+
     shortest = min(map(len, seqs))
     num_seqs = len(seqs)
 
