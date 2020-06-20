@@ -36,21 +36,32 @@ def main() -> None:
     """Make a jazz noise here"""
 
     args = get_args()
+
+    # Get a list of the sequences as strings
     seqs = list(map(lambda s: str(s.seq), SeqIO.parse(args.fasta, 'fasta')))
 
     if not seqs:
         sys.exit(f'"{args.fasta.name}" contains no sequences.')
 
+    # Find the length of the shortest sequence, total num of sequences
     shortest = min(map(len, seqs))
     num_seqs = len(seqs)
 
-    for i in range(shortest, 0, -1):
+    # Count from the shortest down to 0
+    for k in range(shortest, 0, -1):
+        # Create a Counter of strings
         subs : Counter[str] = collections.Counter()
-        for kmer in map(lambda s: set(kmers(i, s)), seqs):
+
+        # Use each kmer of the current size "k" and update the Counter
+        for kmer in map(lambda s: set(kmers(k, s)), seqs):
             subs.update(list(kmer))
 
+        # The most common returns a tuple of the sequence and frequency
         if mc := subs.most_common(1):
             most_common, num = mc[0]
+
+            # If the frequency of the sequence equals the number of 
+            # sequences then it is present in all the sequences.
             if num == num_seqs:
                 print(most_common)
                 break
