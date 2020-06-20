@@ -102,8 +102,44 @@ def main():
         print(f'{aa} => {codons}')
         possible.append(len(codons))
 
+    # print(product(possible) % 1000000)
+
+    possible = pair(possible)
     print(possible)
-    print(product(possible) % 1000000)
+
+    while len(possible) > 1:
+        tmp = [p1 * p2 % 1000000 for p1, p2 in possible]
+        possible = pair(tmp)
+
+    last = possible.pop()
+    print(last[0] * last[1] % 1000000)
+
+
+# --------------------------------------------------
+def pair(xs):
+    """Create a list of pair/tuples from a list"""
+
+    pairs = []
+    while xs:
+        if len(xs) == 1:
+            pairs.append((xs.pop(0), 1))
+        else:
+            pairs.append((xs.pop(0), xs.pop(0)))
+
+    return pairs
+
+
+# --------------------------------------------------
+def test_pair():
+    """Test pair"""
+
+
+    assert pair([]) == []
+    assert pair([1]) == [(1, 1)]
+    assert pair([1, 2]) == [(1, 2)]
+    assert pair([1, 2, 3]) == [(1, 2), (3, 1)]
+    assert pair([1, 2, 3, 4]) == [(1, 2), (3, 4)]
+
 
 # --------------------------------------------------
 def product(xs):
