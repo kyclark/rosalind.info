@@ -4,11 +4,11 @@
 import argparse
 import logging
 import os
+import re
 import requests
 import sys
 from typing import NamedTuple, List, TextIO
 from Bio import SeqIO
-from itertools import starmap
 
 
 class Args(NamedTuple):
@@ -49,6 +49,7 @@ def main():
 
     logging.basicConfig(filename='.log', filemode='w', level=logging.DEBUG)
     files = fetch_fasta(args.file, args.download_dir)
+    regex = re.compile('(?=(N[^P][ST][^P]))')
 
     for file in files:
         seqs = list(SeqIO.parse(file, 'fasta'))
@@ -57,8 +58,8 @@ def main():
             continue
 
         seq = seqs[0]
-        if hits := find_motif(str(seq.seq)):
-            pos = map(lambda p: p + 1, hits)
+        if hits := list(regex.finditer(str(seq.seq))):
+            pos = map(lambda m: m.start() + 1, hits)
             name = os.path.basename(file).replace('.fa', '')
             print('\n'.join([name, ' '.join(map(str, pos))]))
 
@@ -90,67 +91,6 @@ def fetch_fasta(fh: TextIO, fasta_dir: str) -> List[str]:
         files.append(fasta)
 
     return files
-
-
-# --------------------------------------------------
-def find_motif(text: str):
-    """Find a pattern in some text"""
-
-    # pos = []
-    # for i, kmer in enumerate(find_kmers(text, 4)):
-    #     if kmer[0] == 'N' and kmer[1] != 'P' and kmer[
-    #             2] in 'ST' and kmer[3] != 'P':
-    #         pos.append(i)
-
-    # return pos
-
-    return [
-        i for i, kmer in enumerate(find_kmers(text, 4)) if kmer[0] == 'N'
-        and kmer[1] != 'P' and kmer[2] in 'ST' and kmer[3] != 'P'
-    ]
-
-    # def is_match(pos, kmer):
-    #     return (kmer[0] == 'N' and kmer[1] != 'P' and kmer[2] in 'ST'
-    #             and kmer[3] != 'P', pos)
-
-    # def filter_map(f, i):
-    #     return list(
-    #         map(lambda tup: tup[1], filter(lambda tup: tup[0], starmap(f, i))))
-
-    # return filter_map(is_match, enumerate(find_kmers(text, 4)))
-
-
-# --------------------------------------------------
-def test_find_motif():
-    """Test find_pattern"""
-
-    assert find_motif('') == []
-    assert find_motif('NPTX') == []
-    assert find_motif('NXTP') == []
-    assert find_motif('NXSX') == [0]
-    assert find_motif('NXTX') == [0]
-    assert find_motif('XNXSX') == [1]
-    assert find_motif('XNXTX') == [1]
-
-
-# --------------------------------------------------
-def find_kmers(seq, k):
-    """Find k-mers in string"""
-
-    seq = str(seq)
-    n = len(seq) - k + 1
-    return list(map(lambda i: seq[i:i + k], range(n)))
-
-
-# --------------------------------------------------
-def test_find_kmers():
-    """Test find_kmers"""
-
-    assert find_kmers('', 1) == []
-    assert find_kmers('ACTG', 2) == ['AC', 'CT', 'TG']
-    assert find_kmers('ACTG', 3) == ['ACT', 'CTG']
-    assert find_kmers('ACTG', 4) == ['ACTG']
-    assert find_kmers('ACTG', 5) == []
 
 
 # --------------------------------------------------
