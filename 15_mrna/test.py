@@ -5,6 +5,8 @@ import os
 from subprocess import getstatusoutput
 
 prg = './mrna.py'
+input1 = './inputs/1.txt'
+input2 = './inputs/2.txt'
 
 
 # --------------------------------------------------
@@ -36,7 +38,15 @@ def test_ok1():
 def test_ok2():
     """ok"""
 
-    protein = open('rosalind_mrna.txt').read().rstrip()
-    rv, out = getstatusoutput(f'{prg} {protein}')
+    rv, out = getstatusoutput(f'{prg} {input1}')
     assert rv == 0
     assert out.rstrip() == '448832'
+
+
+# --------------------------------------------------
+def test_ok3():
+    """ok"""
+
+    rv, out = getstatusoutput(f'{prg} {input2}')
+    assert rv == 0
+    assert out.rstrip() == '415872'

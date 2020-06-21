@@ -18,7 +18,9 @@ def get_args():
         description='Rock the Casbah',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('protein', metavar='str', help='Input protein or file')
+    parser.add_argument('protein',
+                        metavar='str',
+                        help='Input protein or file')
 
     parser.add_argument('-m',
                         '--modulo',
@@ -114,12 +116,47 @@ def main():
 
     print(product(possible) % args.modulo)
 
+    # possible = pair(possible)
+
+    # while len(possible) > 1:
+    #     tmp = [p1 * p2 % 1000000 for p1, p2 in possible]
+    #     possible = pair(tmp)
+
+    # last = possible.pop()
+    # print(last[0] * last[1] % 1000000)
+
+
+# --------------------------------------------------
+def pair(xs):
+    """Create a list of pair/tuples from a list"""
+
+    pairs = []
+    while xs:
+        if len(xs) == 1:
+            pairs.append((xs.pop(0), 1))
+        else:
+            pairs.append((xs.pop(0), xs.pop(0)))
+
+    return pairs
+
+
+# --------------------------------------------------
+def test_pair():
+    """Test pair"""
+
+
+    assert pair([]) == []
+    assert pair([1]) == [(1, 1)]
+    assert pair([1, 2]) == [(1, 2)]
+    assert pair([1, 2, 3]) == [(1, 2), (3, 1)]
+    assert pair([1, 2, 3, 4]) == [(1, 2), (3, 4)]
+
 
 # --------------------------------------------------
 def product(xs):
     """Return the product"""
 
-    return reduce(lambda x, y: x * y, xs)
+    return reduce(lambda x1, x2: x1 * x2, xs)
 
 
 # --------------------------------------------------

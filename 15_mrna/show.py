@@ -8,7 +8,7 @@ Purpose: Rock the Casbah
 import argparse
 import os
 from functools import reduce
-from collections import defaultdict
+from itertools import product
 
 
 # --------------------------------------------------
@@ -66,15 +66,10 @@ def main():
     }
 
     protein = list(args.protein) + ['Stop']
-    possible = [len(aa_to_codon[aa]) for aa in protein]
-    print(product(possible) % args.modulo)
+    pool = [aa_to_codon[aa] for aa in protein]
+    for i, codons in enumerate(product(*pool), start=1):
+        print(f"{i:5}: {''.join(codons)}")
 
-
-# --------------------------------------------------
-def product(xs):
-    """Return the product"""
-
-    return reduce(lambda x, y: x * y, xs)
 
 
 # --------------------------------------------------
