@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""tests for rna.py"""
+"""tests for prot.py"""
 
 from subprocess import getstatusoutput, getoutput
 import os
 
-prg = './rna.py'
+prg = './prot.py'
 
 
 # --------------------------------------------------
