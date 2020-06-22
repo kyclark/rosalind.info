@@ -40,11 +40,11 @@ def main() -> None:
         sys.exit(f'"{args.file.name}" contains no sequences.')
 
     seq = seqs.pop(0)
-
     for intron in seqs:
         seq = seq.replace(intron, '')
 
     print(Seq.translate(seq.replace('T', 'U')).replace('*', ''))
+
 
 # --------------------------------------------------
 if __name__ == '__main__':
