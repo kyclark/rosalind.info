@@ -37,7 +37,6 @@ def main():
     orfs = set()
     for seq in [rna, Seq.reverse_complement(rna)]:
         for i in range(3):
-            # Transcribe/translate DNA->RNA->AA
             if aa := translate(seq[i:]):
                 # Record distinct ORFs
                 for orf in find_orfs(aa):
@@ -51,14 +50,14 @@ def find_orfs(aa: List[str]) -> List[str]:
     """Find ORFs in AA sequence"""
 
     orfs = []
-    while 'M' in aa and 'Stop' in aa:
+    while 'M' in aa:
         start = aa.index('M')
-        stop = aa.index('Stop')
-        if start > stop:
+        if 'Stop' in aa[start + 1:]:
+            stop = aa.index('Stop', start + 1)
+            orfs.append(''.join(aa[start:stop]))
+            aa = aa[start + 1:]
+        else:
             break
-
-        orfs.append(''.join(aa[start:stop]))
-        aa = aa[start + 1:]
 
     return orfs
 
@@ -144,7 +143,7 @@ def translate(seq: str) -> List[str]:
 
     k = 3
     codons = map(lambda i: seq[i:i + k], range(0, len(seq), k))
-    return list(map(lambda codon: codon_to_aa.get(codon, '-'), codons))
+    return list(map(lambda c: codon_to_aa.get(c, '-'), codons))
 
 
 # --------------------------------------------------
@@ -153,26 +152,6 @@ def test_translate():
 
     assert translate('AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA'
                      ) == list('MAMAPRTEINSTRING') + ['Stop']
-
-
-# --------------------------------------------------
-def find_kmers(seq, k):
-    """Find k-mers in string"""
-
-    seq = str(seq)
-    n = len(seq) - k + 1
-    return list(map(lambda i: seq[i:i + k], range(n)))
-
-
-# --------------------------------------------------
-def test_find_kmers():
-    """Test find_kmers"""
-
-    assert find_kmers('', 1) == []
-    assert find_kmers('ACTG', 2) == ['AC', 'CT', 'TG']
-    assert find_kmers('ACTG', 3) == ['ACT', 'CTG']
-    assert find_kmers('ACTG', 4) == ['ACTG']
-    assert find_kmers('ACTG', 5) == []
 
 
 # --------------------------------------------------
