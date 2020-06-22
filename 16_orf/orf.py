@@ -2,13 +2,18 @@
 """Find ORFs"""
 
 import argparse
-from itertools import takewhile
+import re
+import sys
 from Bio import Seq, SeqIO
-from typing import List
+from typing import List, NamedTuple, TextIO
+
+
+class Args(NamedTuple):
+    file: TextIO
 
 
 # --------------------------------------------------
-def get_args():
+def get_args() -> Args:
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
@@ -20,11 +25,13 @@ def get_args():
                         metavar='FILE',
                         type=argparse.FileType('rt'))
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    return Args(args.file)
 
 
 # --------------------------------------------------
-def main():
+def main() -> None:
     """Make a jazz noise here"""
 
     args = get_args()
@@ -35,10 +42,14 @@ def main():
 
     rna = seqs[0].replace('T', 'U')
     orfs = set()
+
+    # Process forward and reverse
     for seq in [rna, Seq.reverse_complement(rna)]:
+        # Use 0, 1, 2 for frame shifts
         for i in range(3):
+            # Try to translate this frame into amino acids
             if aa := translate(seq[i:]):
-                # Record distinct ORFs
+                # Each ORF has to be individually added to the set
                 for orf in find_orfs(aa):
                     orfs.add(orf)
 
@@ -46,18 +57,37 @@ def main():
 
 
 # --------------------------------------------------
-def find_orfs(aa: List[str]) -> List[str]:
+def find_orfs(aa: str) -> List[str]:
     """Find ORFs in AA sequence"""
 
-    orfs = []
-    while 'M' in aa:
-        start = aa.index('M')
-        if 'Stop' in aa[start + 1:]:
-            stop = aa.index('Stop', start + 1)
-            orfs.append(''.join(aa[start:stop]))
-            aa = aa[start + 1:]
-        else:
-            break
+    # 1: Use in/str.index()
+    # while 'M' in aa:
+    #     start = aa.index('M')
+    #     if 'Stop' in aa[start + 1:]:
+    #         stop = aa.index('Stop', start + 1)
+    #         orfs.append(''.join(aa[start:stop]))
+    #         aa = aa[start + 1:]
+    #     else:
+    #         break
+
+    # 2: Use str.parition()
+    # orfs = []
+    # while True:
+    #     first, middle, rest = aa.partition('0')
+    #     if middle == '':
+    #         break
+
+    #     last = 0
+    #     while True:
+    #         start = first.find('M', last)
+    #         if start == -1:
+    #             break
+    #         orfs.append(first[start:])
+    #         last = start +1
+    #     aa = rest
+
+    # 3: Use re
+    orfs = [c.group(1) for c in re.finditer('(?=(M[^0]*)0)', aa)]
 
     return orfs
 
@@ -66,13 +96,36 @@ def find_orfs(aa: List[str]) -> List[str]:
 def test_find_orfs() -> None:
     """Test find_orfs"""
 
-    aa = ['M', 'A', 'M', 'A', 'P', 'R', 'Stop']
-    assert find_orfs(aa) == ['MAMAPR', 'MAPR']
+    assert find_orfs('') == []
+    assert find_orfs('M') == []
+    assert find_orfs('0') == []
+    assert find_orfs('MAMAPR0') == ['MAMAPR', 'MAPR']
+    assert find_orfs('MAMAPR0M') == ['MAMAPR', 'MAPR']
 
 
 # --------------------------------------------------
-def translate(seq: str) -> List[str]:
-    """Make a jazz noise here"""
+def find_codons(seq: str, k: int) -> List[str]:
+    """Find codons/non-overlapping 3-mers"""
+
+    return list(map(lambda i: seq[i:i + k], range(0, len(seq), k)))
+
+
+# --------------------------------------------------
+def test_find_codons() -> None:
+    """Test find_codons"""
+
+    assert find_codons('', 3) == []
+    assert find_codons('A', 3) == ['A']
+    assert find_codons('AA', 3) == ['AA']
+    assert find_codons('AAA', 3) == ['AAA']
+    assert find_codons('AAAB', 3) == ['AAA', 'B']
+    assert find_codons('AAABB', 3) == ['AAA', 'BB']
+    assert find_codons('AAABBB', 3) == ['AAA', 'BBB']
+
+
+# --------------------------------------------------
+def translate(seq: str) -> str:
+    """Translate RNA in amino acids"""
 
     codon_to_aa = {
         'AAA': 'K',
@@ -123,15 +176,15 @@ def translate(seq: str) -> List[str]:
         'GUC': 'V',
         'GUG': 'V',
         'GUU': 'V',
-        'UAA': 'Stop',
+        'UAA': '0',
         'UAC': 'Y',
-        'UAG': 'Stop',
+        'UAG': '0',
         'UAU': 'Y',
         'UCA': 'S',
         'UCC': 'S',
         'UCG': 'S',
         'UCU': 'S',
-        'UGA': 'Stop',
+        'UGA': '0',
         'UGC': 'C',
         'UGG': 'W',
         'UGU': 'C',
@@ -141,17 +194,18 @@ def translate(seq: str) -> List[str]:
         'UUU': 'F',
     }
 
-    k = 3
-    codons = map(lambda i: seq[i:i + k], range(0, len(seq), k))
-    return list(map(lambda c: codon_to_aa.get(c, '-'), codons))
+    return ''.join(map(lambda c: codon_to_aa.get(c, '-'), find_codons(seq, 3)))
 
 
 # --------------------------------------------------
-def test_translate():
+def test_translate() -> None:
     """Test translate"""
 
-    assert translate('AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA'
-                     ) == list('MAMAPRTEINSTRING') + ['Stop']
+    assert translate('') == ''
+    assert translate('A') == '-'
+    assert translate('XXX') == '-'
+    rna = 'AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA'
+    assert translate(rna) == 'MAMAPRTEINSTRING0'
 
 
 # --------------------------------------------------
