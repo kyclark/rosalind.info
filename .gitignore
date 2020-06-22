@@ -21,3 +21,6 @@ nytprof.out
 .precomp
 __pycache__
 .DS_Store
+.coverage
+.mypy_cache
+.pytest_cache
