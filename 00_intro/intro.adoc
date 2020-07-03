@@ -1,0 +1,3 @@
+= Tiny Bioinformatics Problems
+
+An introduction to programming with Python and bioinformatics.

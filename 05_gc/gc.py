@@ -32,15 +32,19 @@ def main():
     args = get_args()
     high = (0, '')
 
-    for rec in SeqIO.parse(args.file, 'fasta'):
-        # Use a regular expression to find G/Cs upper/lowercase
-        seq = str(rec.seq)
-        gc = re.findall('[gc]', seq, re.IGNORECASE)
-        pct = (len(gc) / len(seq)) * 100
-        if pct > high[0]:
-            high = (pct, rec.id)
+    # high = sorted([gc(seq) for seq in SeqIO.parse(args.file, 'fasta')])[-1]
+    high = sorted(map(gc, SeqIO.parse(args.file, 'fasta')))[-1]
 
     print(f'{high[1]} {high[0]:0.06f}')
+
+
+# --------------------------------------------------
+def gc(rec):
+    """ Return the GC content, record ID for a sequence """
+
+    seq = str(rec.seq)
+    gc = re.findall('[gc]', seq, re.IGNORECASE)
+    return ((len(gc) / len(seq)) * 100, rec.id)
 
 
 # --------------------------------------------------

@@ -3,7 +3,7 @@
 
 import argparse
 import os
-from collections import defaultdict
+from collections import Counter
 from typing import NamedTuple
 
 
@@ -34,12 +34,11 @@ def main() -> None:
     """Make a jazz noise here"""
 
     args = get_args()
-    count = defaultdict(int)
-
-    for base in args.dna.lower():
-        count[base] += 1
-
+    count = Counter(args.dna.lower())
     print(' '.join(map(lambda base: str(count.get(base, 0)), 'acgt')))
+
+    # count_of = lambda base: str(count.get(base, 0))
+    # print(' '.join(map(count_of, 'acgt')))
 
 
 # --------------------------------------------------

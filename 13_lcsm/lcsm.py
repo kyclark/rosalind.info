@@ -53,7 +53,7 @@ def main() -> None:
         subs : Counter[str] = collections.Counter()
 
         # Use each kmer of the current size "k" and update the Counter
-        for kmer in map(lambda s: set(kmers(k, s)), seqs):
+        for kmer in map(lambda seq: set(kmers(k, seq)), seqs):
             subs.update(list(kmer))
 
         # The most common returns a tuple of the sequence and frequency

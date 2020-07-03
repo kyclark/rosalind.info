@@ -70,7 +70,7 @@ def find_orfs(aa: str) -> List[str]:
     #     else:
     #         break
 
-    # 2: Use str.parition()
+    # 2: Use str.partition()
     # orfs = []
     # while True:
     #     first, middle, rest = aa.partition('0')

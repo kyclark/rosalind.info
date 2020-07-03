@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-"""
-Author : Ken Youens-Clark <kyclark@gmail.com>
-Purpose: Tetranucleotide frequency
-"""
+"""Tetranucleotide frequency"""
 
 import argparse
 import os
+from typing import NamedTuple
+
+
+class Args(NamedTuple):
+    dna: str
 
 
 # --------------------------------------------------
-def get_args():
+def get_args() -> Args:
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
@@ -23,11 +25,11 @@ def get_args():
     if os.path.isfile(args.dna):
         args.dna = open(args.dna).read()
 
-    return args
+    return Args(args.dna)
 
 
 # --------------------------------------------------
-def main():
+def main() -> None:
     """Make a jazz noise here"""
 
     args = get_args()

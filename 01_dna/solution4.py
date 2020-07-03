@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-"""
-Author : Ken Youens-Clark <kyclark@gmail.com>
-Purpose: Tetranucleotide frequency
-"""
+"""Tetranucleotide frequency"""
 
 import argparse
 import os
+from typing import NamedTuple, Tuple
+
+
+class Args(NamedTuple):
+    dna: str
 
 
 # --------------------------------------------------
-def get_args():
+def get_args() -> Args:
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
@@ -23,20 +25,45 @@ def get_args():
     if os.path.isfile(args.dna):
         args.dna = open(args.dna).read()
 
-    return args
+    return Args(args.dna)
 
 
 # --------------------------------------------------
-def main():
+def main() -> None:
     """Make a jazz noise here"""
 
     args = get_args()
-    count = {'a': 0, 'c': 0, 'g': 0, 't': 0}
-    for base in args.dna.lower():
-        if base in count:
-            count[base] += 1
+    a, c, g, t = count(args.dna.upper())
+    print(f'{a} {c} {g} {t}')
 
-    print(' '.join([str(count.get(base, 0)) for base in 'acgt']))
+
+# --------------------------------------------------
+def count(dna) -> Tuple[(int, int, int, int)]:
+    """Count bases in DNA"""
+
+    count = {}
+    for base in dna.upper():
+        if not base in count:
+            count[base] = 0
+        count[base] += 1
+
+    return (count.get('A', 0),
+            count.get('C', 0),
+            count.get('G', 0),
+            count.get('T', 0))
+
+
+# --------------------------------------------------
+def test_count() -> None:
+    """Test count"""
+
+    assert count('') == (0, 0, 0, 0)
+    assert count('123XYZ') == (0, 0, 0, 0)
+    assert count('A') == (1, 0, 0, 0)
+    assert count('C') == (0, 1, 0, 0)
+    assert count('G') == (0, 0, 1, 0)
+    assert count('T') == (0, 0, 0, 1)
+    assert count('ACCGGGTTTT') == (1, 2, 3, 4)
 
 
 # --------------------------------------------------
