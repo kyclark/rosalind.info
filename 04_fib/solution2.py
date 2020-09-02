@@ -39,12 +39,21 @@ def main():
 
     args = get_args()
 
-    def fib(n):
-        return 1 if n == 1 \
-            else n - 1 if n == 2 \
-            else fib(n - 2) * args.k + fib(n - 1)
+    fib = [0, 1]
+    for i in range(args.n - 1):
+        fib.append((fib[-2] * args.k) + fib[-1])
 
-    print(fib(args.n))
+    print(fib[-1])
+
+# --------------------------------------------------
+def fib(n):
+    """ Use a generator """
+
+    x, y = 0, 1
+
+    while True:
+        yield x
+        x, y = y, x + y
 
 
 # --------------------------------------------------
